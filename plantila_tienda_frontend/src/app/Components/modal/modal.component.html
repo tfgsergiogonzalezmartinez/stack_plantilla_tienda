@@ -1,0 +1,14 @@
+<div class="fondo indexFondo"></div>
+
+
+<div (click)="stopPropagation($event)" class="modal indexModal">
+  <div #modal class="flex flex-col bg-item w-[1000px] p-4 rounded shadow-sm">
+    <div class="flex flex-row w-full justify-between items-center px-4">
+      <ng-content select="[titulo]"></ng-content>
+      <span class="material-symbols-outlined text-text text-2xl cursor-pointer hover:text-red-500" (click)="closeModal()">close</span>
+    </div>
+    <div class="py-4">
+      <ng-content select="[body]"></ng-content>
+    </div>
+  </div>
+</div>

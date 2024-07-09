@@ -1,0 +1,48 @@
+<div class="flex flex-col h-screen w-screen pt-20 px-6 bg-background">
+  <h2 class="text-text">Configuracion de Usuario</h2>
+  <div class="flex flex-row gap-10">
+    <div class="flex flex-col">
+      <h3 class="my-4 text-text">Datos Personales</h3>
+      <div class="flex flex-wrap flex-row gap-3">
+        <app-inputForm titulo="Nombre" type="text" placeholder="{{Nombre}}" (valueEventEmitter)="Nombre=$event"></app-inputForm>
+        <app-inputForm titulo="Primer Apellido" type="text" placeholder="{{Apellido1}}" (valueEventEmitter)="Apellido1=$event"></app-inputForm>
+        <app-inputForm titulo="Segundo Apellido" type="text" placeholder="{{Apellido2}}" (valueEventEmitter)="Apellido1=$event"></app-inputForm>
+      </div>
+      <h3 class="my-4 text-text">Datos de Envio</h3>
+      <div class="flex flex-wrap flex-row gap-3">
+        <app-inputForm titulo="Direcion de Envio" type="text" placeholder="{{DireccionEnvio}}" (valueEventEmitter)="DireccionEnvio=$event"></app-inputForm>
+        <app-inputForm titulo="Direccion de Facturación" type="text" placeholder="{{DireccionFacturacion}}" (valueEventEmitter)="DireccionFacturacion=$event"></app-inputForm>
+        <app-inputForm titulo="Pais" type="text" placeholder="{{Pais}}" (valueEventEmitter)="Pais=$event"></app-inputForm>
+        <app-inputForm titulo="Provincia" type="text" placeholder="{{Provincia}}" (valueEventEmitter)="Provincia=$event"></app-inputForm>
+        <app-inputForm titulo="Ciudad" type="text" placeholder="{{Ciudad}}" (valueEventEmitter)="Ciudad=$event"></app-inputForm>
+        <app-inputForm titulo="Codigo Postal" type="text" placeholder="{{Cp}}" (valueEventEmitter)="Cp=$event"></app-inputForm>
+      </div>
+      <h3 class="my-4 text-text">Credenciales</h3>
+      <div class="flex flex-wrap flex-row gap-3">
+        <app-inputForm titulo="Email" type="email" placeholder="{{Email}}" (valueEventEmitter)="Email=$event"></app-inputForm>
+        <div class="flex items-end">
+          <button (click)="activarCambioDePassword()" class="px-3 m-0 h-10 text-text-button">Cambiar Contraseña</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+@if (isCambiarPassword) {
+  <app-modal (exitEventEmitter)="isCambiarPassword = false">
+    <h1 class="text-text" titulo>Cambiar contraseña</h1>
+    <div body class="flex flex-col gap-2">
+      <app-inputForm titulo="Contraseña Actual" type="password" (valueEventEmitter)="passwordAntigua=$event"></app-inputForm>
+      <app-inputForm titulo="Nueva Contraseña" type="password" (valueEventEmitter)="PasswordNueva1=$event"></app-inputForm>
+      <app-inputForm titulo="Repita su nueva contraseña" type="password" (valueEventEmitter)="PasswordNueva2=$event"></app-inputForm>
+      <div class="flex p-4 gap-3">
+        <button class="w-full h-10 bg-gray-500 hover:bg-gray-400" (click)="isCambiarPassword = false">Salir</button>
+        <button class="w-full h-10" (click)="cambiarPassword()">Cambiar Contraseña</button>
+      </div>
+    </div>
+
+  </app-modal>
+}
+
+

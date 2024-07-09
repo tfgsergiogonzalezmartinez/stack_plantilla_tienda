@@ -1,0 +1,35 @@
+
+<div class="flex flex-col h-screen w-screen pt-20 px-6 bg-background-dark overflow-x-hidden">
+  <div class="flex flex-row p-2 w-full h-full m-auto paddingRight ">
+    <div class="flex flex-col w-full h-full">
+      <div class="flex flex-col gap-4 w-full px-2">
+        @if (getUserService().isAdmin()) {
+          <h2 class="text-text">Ventas</h2>
+        }@else {
+          <h2 class="text-text">Pedidos</h2>
+        }
+        <div class="table-container bg-background rounded shadow-sm overflow-x-auto">
+          <table class="min-w-full">
+            <thead>
+              <tr>
+                <th class="text-text" *ngFor="let column of columns">{{ column }}</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let row of datosTabla" (click)="clickRow(row)" class="hover:bg-background-light">
+                <td class="text-text" *ngFor="let col of columns">
+                  <ng-container [ngSwitch]="col">
+                    <span *ngSwitchCase="'Usuario'">{{row.Usuario}}</span>
+                    <span *ngSwitchCase="'Productos'">{{row.Productos.length}}</span>
+                    <span *ngSwitchCase="'Fecha'">{{row.FechaCreacion}}</span>
+                    <span *ngSwitchCase="'Total'">{{row.Total}}</span>
+                  </ng-container>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

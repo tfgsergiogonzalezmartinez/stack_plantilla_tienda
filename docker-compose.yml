@@ -1,0 +1,98 @@
+version: '3.8'
+
+services:
+  backend:
+    build:
+      context: ./plantila_tienda_backend
+      dockerfile: Dockerfile
+      args:
+        ARG_IP_FRONT: ${IP_FRONT}
+        ARG_DB_HOST: ${DB_HOST}
+        ARG_DB_PORT: ${DB_PORT}
+        ARG_DB_USER: ${DB_USER}
+        ARG_DB_PASSWORD: ${DB_PASSWORD}
+        ARG_DB_NAME: ${DB_NAME}
+        ARG_MONGO_AUTH_DB: ${MONGO_AUTH_DB}
+        ARG_JWT_SECRET: ${JWT_SECRET}
+        ARG_JWT_AUDIENCE: ${JWT_AUDIENCE}
+        ARG_JWT_ISSUER: ${JWT_ISSUER}
+        ARG_JWT_EXPIRATION: ${JWT_EXPIRATION}
+        ARG_APP_NAME: ${APP_NAME}
+        ARG_APP_VERSION: ${APP_VERSION}
+    environment:
+      - IP_FRONT=${IP_FRONT}
+      - DB_HOST=${DB_HOST}
+      - DB_PORT=${DB_PORT}
+      - DB_USER=${DB_USER}
+      - DB_PASSWORD=${DB_PASSWORD}
+      - DB_NAME=${DB_NAME}
+      - MONGO_AUTH_DB=${MONGO_AUTH_DB}
+      - JWT_SECRET=${JWT_SECRET}
+      - JWT_AUDIENCE=${JWT_AUDIENCE}
+      - JWT_ISSUER=${JWT_ISSUER}
+      - JWT_EXPIRATION=${JWT_EXPIRATION}
+      - APP_NAME=${APP_NAME}
+      - APP_VERSION=${APP_VERSION}
+    ports:
+      - "5000:5000"
+    depends_on:
+      - mongo
+    restart: always
+
+  frontend:
+    build:
+      context: ./plantila_tienda_frontend
+      dockerfile: Dockerfile
+      args:
+        IP_FRONT: ${IP_FRONT}
+        IP_API: ${IP_API}
+        API_HOST: ${API_HOST}
+        IP_PRODUCCION: ${IP_PRODUCCION}
+        IP_DESARROLLO: ${IP_DESARROLLO}
+        Moneda: ${Moneda}
+        Logo_Extension: ${Logo_Extension}
+        Titulo: ${Titulo}
+        Color_background: ${Color_background}
+        Color_background_light: ${Color_background_light}
+        Color_background_dark: ${Color_background_dark}
+        Color_items: ${Color_items}
+        Color_items_light: ${Color_items_light}
+        Color_items_dark: ${Color_items_dark}
+        Color_texto: ${Color_texto}
+        Color_texto_light: ${Color_texto_light}
+        Color_texto_dark: ${Color_texto_dark}
+        Color_boton: ${Color_boton}
+        Color_boton_light: ${Color_boton_light}
+        Color_boton_dark: ${Color_boton_dark}
+        Color_header: ${Color_header}
+        Color_header_light: ${Color_header_light}
+        Color_header_dark: ${Color_header_dark}
+        Color_subHeader: ${Color_subHeader}
+        Color_subHeader_light: ${Color_subHeader_light}
+        Color_subHeader_dark: ${Color_subHeader_dark}
+    environment:
+      - IP_API=${IP_API}
+      - IP_FRONT=${IP_FRONT}
+      - API_HOST=${API_HOST}
+    ports:
+      - "4200:80"
+    depends_on:
+      - backend
+    restart: always
+
+  mongo:
+    image: mongo:latest
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=${DB_USER}
+      - MONGO_INITDB_ROOT_PASSWORD=${DB_PASSWORD}
+      - DB_NAME=${DB_NAME}
+      - MONGO_AUTH_DB=${MONGO_AUTH_DB}
+      - DB_PORT=${DB_PORT}
+    volumes:
+      - mongo-data:/data/db
+    ports:
+      - "27017:27017"
+    restart: always
+
+volumes:
+  mongo-data:

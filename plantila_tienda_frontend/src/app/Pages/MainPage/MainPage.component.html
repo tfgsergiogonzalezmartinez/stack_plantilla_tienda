@@ -1,0 +1,247 @@
+<div class="flex flex-col h-screen w-screen pt-20 px-6 bg-background-dark overflow-x-hidden">
+  <div class="flex flex-row p-2 w-full h-full m-auto paddingRight ">
+    <div class="flex flex-col w-full h-full">
+      <div class="flex flex-row justify-between w-full px-2">
+        <h2 class="text-text">Tienda</h2>
+        <div class="flex flex-row gap-2">
+        <div class="relative flex flex-row gap-5 cursor-pointer rounded hover:bg-background px-2 z-10">
+          <div (click)="toggleFiltros()" class="flex flex-row justify-between">
+            <div class="flex flex-row justify-center items-center">
+              <span class="text-text">Filtros</span>
+            </div>
+            <div class="flex justify-center items-center">
+              <span class="material-symbols-outlined text-lg text-text">
+                keyboard_arrow_down
+              </span>
+            </div>
+          </div>
+          @if (mostrarFiltros) {
+            <div class="absolute top-11 right-0 w-[135px] rounded shadow-sm bg-background flex flex-col gap-1 justify-start items-start">
+              <div (click)="getProductosService().activarFiltrarDesc()" class="flex flex-row justify-center items-center">
+                <span class="text-sm p-1 hover:bg-background-light transition-colors text-text">Precio ascendente</span>
+              </div>
+              <div (click)="getProductosService().activarFiltrarAsc()" class="flex flex-row justify-center items-center">
+                <span class="text-sm p-1 hover:bg-background-light transition-colors text-text">Precio descendente</span>
+              </div>
+            </div>
+          }
+        </div>
+        @if (getUserService().isAdmin()) {
+          <div class="flex flex-row justify-center items-center">
+            <button (click)="getProductosService().setIsNuevoProducto(true)">Nuevo Producto</button>
+          </div>
+        }
+      </div>
+      </div>
+      <div class="flex flex-row flex-wrap gap-14 justify-start">
+        @for (item of getProductosService().getListaProductos(); track $index) {
+          <app-Item [Producto]="item"></app-Item>
+        }
+      </div>
+    </div>
+
+
+  </div>
+</div>
+
+<div class="fixed right-6 top-20 flex flex-col w-[280px] w-min-[280px] w-max-[280px] top-0 h-screen">
+    <app-CarritoCompras></app-CarritoCompras>
+</div>
+
+@if (getProductosService().getProductoSeleccionado()) {
+<app-modal (exitEventEmitter)="salirProductorSeleccionado()">
+  <h1 class="text-text" titulo>{{getProductosService().getProductoSeleccionado()!.Nombre}}</h1>
+  <div body class="flex flex-row gap-2">
+    <div class="flex flex-col p-4 gap-3 overflow-y-auto">
+      <div class="flex flex-row gap-5">
+        <div class="flex flex-col  gap-1 h-[400px] h-min-[400px] h-max-[400px] overflow-y-auto">
+         @for (item of getProductosService().getProductoSeleccionado()?.Fotos; track $index) {
+            <img (click)="getProductosService().setFotoPrincipalProducto(item)" class="w-[50px] w-min-[50px] w-max-[50px] h-[50px] h-min-[50px] h-max-[50px] rounded" [src]="item" alt="">
+         }
+        </div>
+        <div class="flex w-[400px] min-w-[400px] max-w-[400px] h-[400px] min-h-[400px] max-h-[400px]">
+          @if (!getProductosService().getProductoSeleccionado()?.FotoPrincipal || getProductosService().getProductoSeleccionado()?.FotoPrincipal == ""){
+            <img class="w-[400px] min-w-[400px] max-w-[400px] h-[400px] min-h-[400px] max-h-[400px] rounded" [src]="'https://placehold.co/500x500'" alt="">
+          }@else {
+            <img class="w-[400px] min-w-[400px] max-w-[400px] h-[400px] min-h-[400px] max-h-[400px] rounded" [src]="getProductosService().getProductoSeleccionado()?.FotoPrincipal" alt="">
+          }
+        </div>
+        <div class="flex flex-col">
+          @if (getUserService().isAdmin()) {
+            <button (click)="clickInputImagenes()">Agregar Imagenes</button>
+            <input #inputImagenes class="hidden" type="file" (change)="seleccionarImagenes($event)" multiple accept="image/*">
+            @if (base64Imagenes.length>0) {
+              <div class="flex flex-col mt-2 flex-wrap gap-2">
+                <h4 class="py-2 font-semibold text-text">Selecciona la imagen principal del producto</h4>
+                <div class="flex flex-row mt-2 flex-wrap gap-2">
+                  @for (item of base64Imagenes; track $index) {
+                    @if (item == imagenPrincipal) {
+                      <img (click)="imagenPrincipal=''" class="w-[50px] w-min-[50px] w-max-[50px] h-[50px] h-min-[50px] h-max-[50px] rounded scale-105 transition-all cursor-pointer border-2 border-primary" [src]="item" alt="">
+                    }@else {
+                      <img (click)="imagenPrincipal=item" class="w-[50px] w-min-[50px] w-max-[50px] h-[50px] h-min-[50px] h-max-[50px] rounded hover:scale-105 transition-all cursor-pointer" [src]="item" alt="">
+                    }
+                  }
+                  <button class="h-10" (click)="subirImagenes()">Guardar</button>
+                </div>
+              </div>
+            }
+          }
+            <h4 class="py-2 font-semibold text-text">Tallas</h4>
+            <div class="flex flex-row flex-wrap gap-2">
+              @for (talla of getProductosService().getProductoSeleccionado()?.Tallas; track $index) {
+                <span (click)="getProductosService().setTallaSeleccionada(talla)" [ngClass]="{'seleccionada' : talla == getProductosService().getTallaSeleccionada() }" class="px-3 py-1 rounded border-2 border-primary hover:bg-background-dark cursor-pointer text-text">{{talla}}</span>
+              }
+            </div>
+            <h4 class="py-2 font-semibold text-text">Colores</h4>
+            <div class="flex flex-row flex-wrap gap-2">
+              @for (color of getProductosService().getProductoSeleccionado()?.Colores; track $index) {
+                <span (click)="getProductosService().setColorSeleccionado(color)" [ngClass]="{'seleccionada' : color == getProductosService().getColorSeleccionado()}" class="px-3 py-1 rounded border-2 border-primary hover:bg-background-dark cursor-pointer text-text">{{color}}</span>
+              }
+            </div>
+            <h4 class="py-2 font-semibold text-text">Precio</h4>
+            <div class="flex flex-row flex-wrap gap-2">
+                <span class="font-semibold text-text">{{getProductosService().getProductoSeleccionado()?.Precio}}</span>
+            </div>
+            <div class="flex flex-row py-6">
+              <button (click)="addProducto()" class="w-full h-10 bg-primary hover:bg-primary-dark transition-colors">Añadir al carrito</button>
+            </div>
+        </div>
+
+      </div>
+      <div class="flex flex-col gap-2">
+        <h4 class="font-semibold text-text">Descripcion</h4>
+        <p class="text-text">{{getProductosService().getProductoSeleccionado()!.Descripcion}}</p>
+
+      </div>
+
+    </div>
+  </div>
+</app-modal>
+
+
+
+}
+
+
+@if (getProductosService().getIsNuevoProducto()) {
+  <app-modal (exitEventEmitter)="salirNuevoProducto()">
+    <h1 class="text-text" titulo>Nuevo Producto</h1>
+    <div body class="flex flex-row gap-2">
+      <div class="flex flex-col p-4 gap-3 overflow-y-auto">
+        <div class="flex flex-row gap-5">
+          <div class="flex flex-col  gap-1 h-[400px] h-min-[400px] h-max-[400px] overflow-y-auto">
+            @if (base64Imagenes.length > 0) {
+              @for (item of base64Imagenes; track $index) {
+                <img (click)="getProductosService().setFotoPrincipalProducto(item)" class="w-[50px] w-min-[50px] w-max-[50px] h-[50px] h-min-[50px] h-max-[50px] rounded" [src]="item" alt="">
+              }
+            }@else {
+              <img class="w-[50px] w-min-[50px] w-max-[50px] h-[50px] h-min-[50px] h-max-[50px] rounded" src="https://via.placeholder.com/100x100" alt="">
+              <img class="w-[50px] w-min-[50px] w-max-[50px] h-[50px] h-min-[50px] h-max-[50px] rounded" src="https://via.placeholder.com/100x100" alt="">
+              <img class="w-[50px] w-min-[50px] w-max-[50px] h-[50px] h-min-[50px] h-max-[50px] rounded" src="https://via.placeholder.com/100x100" alt="">
+              <img class="w-[50px] w-min-[50px] w-max-[50px] h-[50px] h-min-[50px] h-max-[50px] rounded" src="https://via.placeholder.com/100x100" alt="">
+              <img class="w-[50px] w-min-[50px] w-max-[50px] h-[50px] h-min-[50px] h-max-[50px] rounded" src="https://via.placeholder.com/100x100" alt="">
+              <img class="w-[50px] w-min-[50px] w-max-[50px] h-[50px] h-min-[50px] h-max-[50px] rounded" src="https://via.placeholder.com/100x100" alt="">
+              <img class="w-[50px] w-min-[50px] w-max-[50px] h-[50px] h-min-[50px] h-max-[50px] rounded" src="https://via.placeholder.com/100x100" alt="">
+              <img class="w-[50px] w-min-[50px] w-max-[50px] h-[50px] h-min-[50px] h-max-[50px] rounded" src="https://via.placeholder.com/100x100" alt="">
+            }
+            </div>
+            <div class="flex w-[400px] min-w-[400px] max-w-[400px] h-[400px] min-h-[400px] max-h-[400px]">
+            @if (imagenPrincipal != "") {
+              <img class="w-[400px] min-w-[400px] max-w-[400px] h-[400px] min-h-[400px] max-h-[400px] rounded" [src]="imagenPrincipal" alt="">
+            }@else {
+              <img class="w-[400px] min-w-[400px] max-w-[400px] h-[400px] min-h-[400px] max-h-[400px] rounded" src="https://via.placeholder.com/500x500" alt="">
+            }
+          </div>
+          <div class="flex flex-col gap-2">
+            @if (getUserService().isAdmin()) {
+              <button (click)="clickInputImagenes()">Agregar Imagenes</button>
+              <input #inputImagenes class="hidden" type="file" (change)="seleccionarImagenes($event)" multiple accept="image/*">
+              @if (base64Imagenes.length>0) {
+                <div class="flex flex-col mt-2 flex-wrap gap-2">
+                  <h4 class="py-2 font-semibold text-text">Selecciona la imagen principal del producto</h4>
+                  <div class="flex flex-row mt-2 flex-wrap gap-2">
+                    @for (item of base64Imagenes; track $index) {
+                      @if (item == imagenPrincipal) {
+                        <img (click)="imagenPrincipal=''" class="w-[50px] w-min-[50px] w-max-[50px] h-[50px] h-min-[50px] h-max-[50px] rounded scale-105 transition-all cursor-pointer border-2 border-primary" [src]="item" alt="">
+                      }@else {
+                        <img (click)="imagenPrincipal=item" class="w-[50px] w-min-[50px] w-max-[50px] h-[50px] h-min-[50px] h-max-[50px] rounded hover:scale-105 transition-all cursor-pointer" [src]="item" alt="">
+                      }
+                    }
+                  </div>
+                </div>
+              }
+            }
+              <div class="grid grid-cols-2 gap-2 justify-center items-center">
+                <h4 class="py-2 font-semibold text-text">Nombre</h4>
+                <input [(ngModel)]="nuevoNombre" type="text" placeholder="Nombre" class="w-full h-10 rounded border-2 bg-white-600 border-gray-300 px-2">
+              </div>
+              <div class="grid grid-cols-2 gap-2 justify-center items-center">
+                <h4 class="py-2 font-semibold text-text">Categoria</h4>
+                <select [(ngModel)]="nuevoCategoria" class="w-full h-10 rounded border-2 border-background-dark px-2">
+                  @for (cat of listaCategorias; track $index) {
+                    <option value="{{cat.Nombre}}">{{cat.Nombre}}</option>
+                  }
+                </select>
+              </div>
+              <div class="flex flex-col gap-1">
+                <div class="flex w-full gap-5 justify-between items-center">
+                  <h4 class="py-2 font-semibold text-text">Tallas</h4>
+                  <div class="flex flex-row gap-2">
+                    <input [(ngModel)]="nuevaTalla" type="text" placeholder="Inserta talla" class="w-full h-10 rounded border-2 bg-white-600 border-gray-300 px-2">
+                    <button (click)="addTalla()">Añadir</button>
+                  </div>
+                </div>
+                @if (listaNuevasTallas.length>0) {
+                  <div class="grid grid-cols-2 justify-center">
+                    <span class="font-semibold text-text">Tallas añadidas</span>
+                    <div class="flex flex-row gap-2 flex-wrap">
+                      @for (talla of listaNuevasTallas; track $index) {
+                        <span class="px-3 py-1 rounded border-2 border-primary text-text">{{talla}}</span>
+                      }
+                    </div>
+                  </div>
+                }
+              </div>
+              <div class="flex flex-col gap-1">
+                <div class="flex w-full gap-5 justify-between items-center">
+                  <h4 class="py-2 font-semibold text-text">Colores</h4>
+                  <div class="flex flex-row gap-2">
+                    <input [(ngModel)]="nuevoColor" type="text" placeholder="Inserta Color" class="w-full h-10 rounded border-2 border-background-dark px-2">
+                    <button (click)="addColor()">Añadir</button>
+                  </div>
+                </div>
+                @if (listaNuevosColores.length>0) {
+                  <div class="grid grid-cols-2 justify-center">
+                    <span class="font-semibold text-text">Colores añadidos</span>
+                    <div class="flex flex-row gap-2 flex-wrap">
+                      @for (color of listaNuevosColores; track $index) {
+                        <span class="px-3 py-1 rounded border-2 border-primary text-text">{{color}}</span>
+                      }
+                    </div>
+                  </div>
+                }
+              </div>
+              <div class="grid grid-cols-2 justify-center items-center">
+                <h4 class="py-2 font-semibold text-text">Precio</h4>
+                <input [(ngModel)]="nuevoPrecio" type="number" placeholder="Inserte precio" class="w-full h-10 rounded border-2 border-background-dark px-2">
+              </div>
+              <div class="flex flex-row py-6">
+                <button (click)="crearProducto()" class="w-full h-10 bg-primary hover:bg-primary-dark transition-colors">Crear producto</button>
+              </div>
+          </div>
+
+        </div>
+        <div class="flex flex-col gap-2">
+          <h4 class="font-semibold text-text">Descripcion</h4>
+          <input [(ngModel)]="nuevoDescripcion" type="text" placeholder="Descripcion" class="w-full h-10 rounded border-2 border-background-dark px-2">
+
+        </div>
+
+      </div>
+    </div>
+  </app-modal>
+
+
+
+  }
+
